@@ -1,0 +1,399 @@
+<?php include 'db_connect.php' ?>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --primary: #4361ee;
+  --secondary: #3f37c9;
+  --success: #4cc9f0;
+  --info: #4895ef;
+  --dark: #212529;
+  --light: #f8f9fa;
+  --gray: #6c757d;
+}
+
+.dashboard {
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dashcard {
+  margin-bottom: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dashcard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background-color: var(--primary);
+  color: white;
+  font-weight: 600;
+  padding: 15px 20px;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 10px;
+  color: white;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 200%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(30deg);
+}
+
+.stat-card i {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.stat-card h4 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.stat-card h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.category-card {
+  background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+}
+
+.billing-card {
+  background: linear-gradient(135deg, #f72585 0%, #b5179e 100%);
+}
+
+.product-card {
+  background: linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%);
+}
+
+.user-card {
+  background: linear-gradient(135deg, #7209b7 0%, #560bad 100%);
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th {
+  background-color: #f8f9fa;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.table td, .table th {
+  padding: 12px 15px;
+  vertical-align: middle;
+}
+
+.table tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.table tr:hover {
+  background-color: #e9ecef;
+}
+
+.badge {
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.badge-success {
+  background-color: #38b000;
+}
+
+.badge-primary {
+  background-color: var(--primary);
+}
+
+.welcome-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.welcome-card h2 {
+  color: var(--dark);
+  font-weight: 700;
+}
+
+.welcome-card p {
+  color: var(--gray);
+}
+
+@media (max-width: 768px) {
+  .stat-card h3 {
+    font-size: 1.5rem;
+  }
+  
+  .table td, .table th {
+    padding: 8px 10px;
+  }
+}
+</style>
+
+<div class="dashboard">
+  <div class="row">
+    <!-- Welcome Card -->
+    <div class="col-lg-12 mb-4">
+      <div class="card welcome-card">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <h2>Welcome back, <?php echo $_SESSION['login_name'] ?>!</h2>
+            <p class="mb-0">Here's what's happening with your store today.</p>
+          </div>
+          <div class="d-none d-md-block">
+            <i class="fas fa-store-alt fa-3x text-primary"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="col-md-6">
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <div class="stat-card category-card">
+            <i class="fas fa-tags"></i>
+            <h4>Categories</h4>
+            <h3>30</h3>
+          </div>
+        </div>
+        <div class="col-md-6 mb-4">
+          <div class="stat-card billing-card">
+            <i class="fas fa-receipt"></i>
+            <h4>Orders</h4>
+            <h3>20</h3>
+          </div>
+        </div>
+        <div class="col-md-6 mb-4">
+          <div class="stat-card product-card">
+            <i class="fas fa-pizza-slice"></i>
+            <h4>Products</h4>
+            <h3>120</h3>
+          </div>
+        </div>
+        <div class="col-md-6 mb-4">
+          <div class="stat-card user-card">
+            <i class="fas fa-users"></i>
+            <h4>Users</h4>
+            <h3>4</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sales Chart -->
+    <div class="col-md-6 mb-4">
+      <div class="card dashcard">
+        <div class="card-header">
+          <b>Sales Overview</b>
+        </div>
+        <div class="card-body">
+          <div class="chart-container">
+            <canvas id="salesChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Recent Orders Table -->
+    <div class="col-lg-12">
+      <div class="card dashcard">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <b>Recent Orders</b>
+          <a href="#" class="btn btn-sm btn-primary">View All</a>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Date</th>
+                  <th>Invoice</th>
+                  <th>Order #</th>
+                  <th class="text-right">Amount</th>
+                  <th class="text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php 
+                $i = 1;
+                $order = $conn->query("SELECT * FROM orders order by unix_timestamp(date_created) desc LIMIT 7");
+                while($row=$order->fetch_assoc()):
+                ?>
+                <tr>
+                  <td class="text-center"><?php echo $i++ ?></td>
+                  <td><?php echo date("M d, Y",strtotime($row['date_created'])) ?></td>
+                  <td><?php echo $row['amount_tendered'] > 0 ? $row['ref_no'] : 'N/A' ?></td>
+                  <td><?php echo $row['order_number'] ?></td>
+                  <td class="text-right">$<?php echo number_format($row['total_amount'],2) ?></td>
+                  <td class="text-center">
+                    <?php if($row['amount_tendered'] > 0): ?>
+                      <span class="badge badge-success">Paid</span>
+                    <?php else: ?>
+                      <span class="badge badge-primary">Pending</span>
+                    <?php endif; ?>
+                  </td>
+                </tr>
+                <?php endwhile; ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Category Sales Chart -->
+    <div class="col-lg-12 mt-4">
+      <div class="card dashcard">
+        <div class="card-header">
+          <b>Category Sales</b>
+        </div>
+        <div class="card-body">
+          <div class="chart-container">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Sales Chart
+const salesCtx = document.getElementById('salesChart').getContext('2d');
+const salesChart = new Chart(salesCtx, {
+  type: 'line',
+  data: {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [{
+      label: 'Monthly Sales',
+      data: [1200, 1900, 1500, 2000, 1800, 2200],
+      backgroundColor: 'rgba(67, 97, 238, 0.2)',
+      borderColor: 'rgba(67, 97, 238, 1)',
+      borderWidth: 2,
+      tension: 0.4,
+      fill: true
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      tooltip: {
+        mode: 'index',
+        intersect: false,
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          drawBorder: false
+        }
+      },
+      x: {
+        grid: {
+          display: false
+        }
+      }
+    }
+  }
+});
+
+// Category Chart
+const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+const categoryChart = new Chart(categoryCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Chinese', 'Mexican', 'Pizza', 'Japanese', 'Thai'],
+    datasets: [{
+      data: [11, 2, 2, 2, 7],
+      backgroundColor: [
+        '#4361ee',
+        '#f72585',
+        '#4cc9f0',
+        '#7209b7',
+        '#4895ef'
+      ],
+      borderWidth: 0
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'right',
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            let label = context.label || '';
+            let value = context.raw || 0;
+            let total = context.dataset.data.reduce((a, b) => a + b, 0);
+            let percentage = Math.round((value / total) * 100);
+            return `${label}: ${value} (${percentage}%)`;
+          }
+        }
+      }
+    },
+    cutout: '70%'
+  }
+});
+
+// Animation for stat cards
+document.querySelectorAll('.stat-card').forEach(card => {
+  card.addEventListener('mouseenter', function() {
+    this.style.transform = 'scale(1.03)';
+  });
+  card.addEventListener('mouseleave', function() {
+    this.style.transform = 'scale(1)';
+  });
+});
+</script>
