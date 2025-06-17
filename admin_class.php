@@ -225,39 +225,60 @@ Class Action {
 		}
 	}
 	function save_product(){
-		extract($_POST);
-		$data = "";
-		foreach($_POST as $k => $v){
-			if(!in_array($k, array('id','status')) && !is_numeric($k)){
-				if($k == 'price'){
-					$v= str_replace(',', '', $v);
-				}
-				if(empty($data)){
-					$data .= " $k='$v' ";
-				}else{
-					$data .= ", $k='$v' ";
-				}
+	extract($_POST);
+	$data = "";
+	foreach($_POST as $k => $v){
+		if(!in_array($k, array('id','status')) && !is_numeric($k)){
+			if($k == 'price'){
+				$v= str_replace(',', '', $v);
+			}
+			if(empty($data)){
+				$data .= " $k='" . addslashes($v) . "' ";
+			}else{
+				$data .= ", $k='" . addslashes($v) . "' ";
 			}
 		}
-		if(isset($status)){
-					$data .= ", status=1 ";
-		}else{
-					$data .= ", status=0 ";
-		}
-		$check = $this->db->query("SELECT * FROM products where name ='$name' ".(!empty($id) ? " and id != {$id} " : ''))->num_rows;
-		if($check > 0){
-			return 2;
-			exit;
-		}
-		if(empty($id)){
-			$save = $this->db->query("INSERT INTO products set $data");
-		}else{
-			$save = $this->db->query("UPDATE products set $data where id = $id");
-		}
-
-		if($save)
-			return 1;
 	}
+
+	// ✅ Handle status
+	if(isset($status)){
+		$data .= ", status=1 ";
+	}else{
+		$data .= ", status=0 ";
+	}
+
+	// ✅ Handle image upload
+	if(isset($_FILES['product_image']) && $_FILES['product_image']['tmp_name'] != ''){
+		$folder = 'uploads/products/';
+		if (!is_dir($folder)) {
+			mkdir($folder, 0777, true);
+		}
+		$filename = time() . '_' . basename($_FILES['product_image']['name']);
+		$filepath = $folder . $filename;
+
+		if(move_uploaded_file($_FILES['product_image']['tmp_name'], $filepath)){
+			$data .= ", image_path = '$filename' ";
+		}
+	}
+
+	// ✅ Check duplicate name
+	$check = $this->db->query("SELECT * FROM products WHERE name ='$name' ".(!empty($id) ? " AND id != {$id} " : ''))->num_rows;
+	if($check > 0){
+		return 2;
+		exit;
+	}
+
+	// ✅ Insert or update
+	if(empty($id)){
+		$save = $this->db->query("INSERT INTO products SET $data");
+	}else{
+		$save = $this->db->query("UPDATE products SET $data WHERE id = $id");
+	}
+
+	if($save)
+		return 1;
+}
+
 	function delete_product(){
 		extract($_POST);
 		$delete = $this->db->query("DELETE FROM products where id = ".$id);

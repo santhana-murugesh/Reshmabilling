@@ -72,6 +72,7 @@
 							<thead>
 								<tr>
 									<th>#</th>
+									<th>Product Image</th>
 									<th>Category</th>
 									<th>Name</th>
 									<th>Description</th>
@@ -88,7 +89,15 @@
 								while($row=$product->fetch_assoc()):
 								?>
 								<tr>
+									
 									<td class="text-center"><?php echo $i++ ?></td>
+									<td class="text-center">
+                                        <?php if(!empty($row['image_path'])): ?>
+                                            <img src="uploads/products/<?php echo $row['image_path'] ?>" alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
+                                        <?php else: ?>
+                                            <span class="text-muted">No image</span>
+                                        <?php endif; ?>
+                                    </td>
 									<td class="">
 										<?php echo $cname[$row['category_id']] ?>
 									</td>

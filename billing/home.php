@@ -112,7 +112,7 @@ endif;
                             ?>
                             <div class="col-md-2 mb-2">
                                 <div class="prod-item text-center " data-json = '<?php echo json_encode($row) ?>' data-category-id="<?php echo $row['category_id'] ?>">
-                                    <img src="../assets/uploads/element-banner2-right.jpg" class="rounded" width="100%">
+                                    <img src="../uploads/products/<?php echo $row['image_path'] ?>" class="rounded" width="100%" height="100%" >
                                         <span> 
                                             <?php echo $row['name'] ?>
                                         </span>
@@ -169,7 +169,7 @@ endif;
                            <tr>
                                <td>
                                    <div class="d-flex align-items-center justify-content-center">
-                                        <span class=   " btn-minus"><b> </b></span>
+                                        <span class="btn-minus"><b> </b></span>
                                         <input type="number" name="qty[]" id="" value="<?php echo $row['qty'] ?>">
                                         <span class="btn-plus"><b></b></span>
                                    </div>
@@ -185,7 +185,7 @@ endif;
                                     <span class="amount"><?php echo number_format($row['amount'],2) ?></span>
                                 </td>
                                 <td>
-                                    <span class=" btn-rem"><b><i class="fa fa-trash-alt"></i></b></span>
+                                    <span class="btn-rem"><b><i class="fa fa-trash-alt"></i></b></span>
                                 </td>
                            </tr>
                            <script>
@@ -262,13 +262,13 @@ endif;
             var tr = $('#o-list tr[data-id="'+data.id+'"]')
             var qty = tr.find('[name="qty[]"]').val();
                 qty = parseInt(qty) + 1;
-                qty = tr.find('[name="qty[]"]').val(qty).trigger('change')
+                tr.find('[name="qty[]"]').val(qty).trigger('change')
                 calc()
             return false;
         }
-        var tr = $('<tr class="o-item"></tr>')
+        var tr = $('<tr class="o-item" data-id="'+data.id+'"></tr>')
         tr.attr('data-id',data.id)
-        tr.append('<td><div class="d-flex align-items-center"><span class="btn-minus"><b></i></b></span><input type="number" name="qty[]" id="" value="1"><span class=" btn-plus"><b></b></span></div></td>') 
+        tr.append('<td><div class="d-flex align-items-center"><span class="btn-minus"><b></i></b></span><input type="number" name="qty[]" id="" value="1"><span class="btn-plus"><b></b></span></div></td>') 
 
 
         tr.append('<td><input type="hidden" name="item_id[]" id="" value=""><input type="hidden" name="product_id[]" id="" value="'+data.id+'">'+data.name+' <small class="psmall">('+(parseFloat(data.price).toLocaleString("en-US",{style:'decimal',minimumFractionDigits:2,maximumFractionDigits:2}))+')</small></td>') 
@@ -301,26 +301,29 @@ endif;
             calc()
          })
          
+         // Add event handlers for direct input changes
+         $('#o-list input[name="qty[]"]').on('input change', function(){
+            var tr = $(this).closest('tr');
+            var qty = $(this).val();
+            if(qty < 1) {
+                qty = 1;
+                $(this).val(1);
+            }
+            var price = tr.find('[name="price[]"]').val()
+            var amount = parseFloat(qty) * parseFloat(price);
+            tr.find('[name="amount[]"]').val(amount)
+            tr.find('.amount').text(parseFloat(amount).toLocaleString("en-US",{style:'decimal',minimumFractionDigits:2,maximumFractionDigits:2}))
+            calc()
+         });
     }
     function calc(){
-         $('[name="qty[]"]').each(function(){
-            $(this).change(function(){
-                var tr = $(this).closest('tr');
-                var qty = $(this).val();
-                var price = tr.find('[name="price[]"]').val()
-                var amount = parseFloat(qty) * parseFloat(price);
-                    tr.find('[name="amount[]"]').val(amount)
-                    tr.find('.amount').text(parseFloat(amount).toLocaleString("en-US",{style:'decimal',minimumFractionDigits:2,maximumFractionDigits:2}))
-                
-            })
-         })
          var total = 0;
          $('[name="amount[]"]').each(function(){
             total = parseFloat(total) + parseFloat($(this).val()) 
          })
-            console.log(total)
         $('[name="total_amount"]').val(total)
         $('#total_amount').text(parseFloat(total).toLocaleString("en-US",{style:'decimal',minimumFractionDigits:2,maximumFractionDigits:2}))
+        $('#apayable').val(parseFloat(total).toLocaleString("en-US",{style:'decimal',minimumFractionDigits:2,maximumFractionDigits:2}))
     }
    function cat_func(){
     $('.cat-item').click(function(){
