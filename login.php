@@ -34,7 +34,7 @@ header("location:index.php?page=home");
 	    position: fixed;
 	    top:0;
 	    left: 0;
-	    background-image: url('assets/uploads/background.webp');
+	    background-image: url('assets/uploads/background2.jpg');
 	    background-size: cover;
 	}
 	main#main{
