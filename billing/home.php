@@ -1,4 +1,29 @@
 <?php include '../db_connect.php' ?>
+<?php
+function generateOrderNumber($conn) {
+    $query = $conn->query("SELECT MAX(CAST(SUBSTRING(order_number, 4) AS UNSIGNED)) as max_num FROM orders");
+    $result = $query->fetch_assoc();
+    $next_num = $result['max_num'] + 1;
+    return 'ORD' . str_pad($next_num, 6, '0', pad_type: STR_PAD_LEFT);
+}
+
+if(isset($_GET['id'])) {
+    $order = $conn->query("SELECT * FROM orders WHERE id = " . intval($_GET['id']));
+    if($order->num_rows > 0) {
+        foreach($order->fetch_array() as $k => $v) {
+            $$k = $v;
+        }
+        $items = $conn->query("SELECT o.*, p.name FROM order_items o 
+                             INNER JOIN products p ON p.id = o.product_id 
+                             WHERE o.order_id = " . intval($id));
+    } else {
+        header("Location: ../index.php");
+        exit();
+    }
+} else {
+    $order_number = generateOrderNumber($conn);
+}
+?>
 <style>
    span.float-right.summary_icon {
     font-size: 3rem;
@@ -124,8 +149,7 @@ endif;
                 </div>
             <div class="card-footer">
                 <div class="row justify-content-center">
-                    <div class="btn btn btn-sm col-sm-3 btn-primary mr-2" type="button" id="pay">Pay</div>
-                    <div class="btn btn btn-sm col-sm-3 btn-primary" type="button" id="save_order">Pay later</div>
+                    <div class="btn btn btn-sm col-sm-3 btn-primary mr-2" type="button" id="pay">Print</div>
                 </div>
             </div>
             </div>      			
@@ -144,7 +168,7 @@ endif;
                 <div class="bg-white" id='o-list'>
                             <div class="d-flex w-100 bg-white mb-1">
                                 <label for="" class="text-dark"><b>Order No.</b></label>
-                                <input type="number" class="form-control-sm" name="order_number" value="<?php echo isset($order_number) ? $order_number : '' ?>" required>
+                                <input type="text" class="form-control-sm" name="order_number" value="<?php echo isset($order_number) ? $order_number : generateOrderNumber() ?>" readonly required>
                             </div>
                    <table class="table bg-light mb-5" >
                         <colgroup>
@@ -224,7 +248,7 @@ endif;
     <div class="modal-dialog modal-dialog-centered modal-md" role="document">
       <div class="modal-content">
         <div class="modal-header">
-        <h5 class="modal-title"><b>Pay</b></h5>
+        <h5 class="modal-title"><b>Print</b></h5>
          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -232,21 +256,21 @@ endif;
       <div class="modal-body">
         <div class="container-fluid">
             <div class="form-group">
-                <label for="">Amount Payable</label>
-                <input type="number" class="form-control text-right" id="apayable" readonly="" value="">
-            </div>
+                        <label for="">Amount Payable</label>
+                        <input type="text" class="form-control text-right" id="apayable" readonly value="">
+                    </div>
             <div class="form-group">
-                <label for="">Amount Tendered</label>
+                <label for="">Amount received</label>
                 <input type="text" class="form-control text-right" id="tendered" value="" autocomplete="off">
             </div>
             <div class="form-group">
-                <label for="">Change</label>
+                <label for="">Balance</label>
                 <input type="text" class="form-control text-right" id="change" value="0.00" readonly="">
             </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary btn-sm"  form="manage-order">Pay</button>
+        <button type="submit" class="btn btn-primary btn-sm"  form="manage-order">print</button>
         <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
       </div>
       </div>

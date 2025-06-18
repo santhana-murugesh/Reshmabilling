@@ -69,7 +69,7 @@
       width: 100%;
       height: 100vh;
       background-color: #fff;
-      background-image: url("assets/uploads/loading.gif");
+      background-image: url("assets/uploads/loader.gif");
       background-repeat: no-repeat;
       background-position: center;
       background-size:500px;
