@@ -1,4 +1,11 @@
 <?php include 'db_connect.php' ?>
+<?php
+$category_count = $conn->query("SELECT COUNT(*) AS total FROM categories")->fetch_assoc()['total'];
+$order_count = $conn->query("SELECT COUNT(*) AS total FROM orders")->fetch_assoc()['total'];
+$product_count = $conn->query("SELECT COUNT(*) AS total FROM products")->fetch_assoc()['total'];
+$user_count = $conn->query("SELECT COUNT(*) AS total FROM users")->fetch_assoc()['total'];
+?>
+
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart']});
@@ -6,14 +13,7 @@
 
       function drawChart() {
 
-        var data = google.visualization.arrayToDataTable([
-          ['Category', 'Sold Per Day'],
-          ['Chinese',     11],
-          ['Mexican',      2],
-          ['Pizza',  2],
-          ['Japanese', 2],
-          ['Thai',    7]
-        ]);
+        
 
         var options = {
           title: 'Recent Sale'
@@ -71,58 +71,58 @@
                 </div>
             </div>      			
         </div> -->
-        <div class="col-md-6">
-        <div class="row">
-        <div class="col-md-6 mb-3">
+      <div class="col-md-12">
+    <div class="row">
+        <div class="col-md-3 mb-3">
             <div class="card bg-white border-0 circle-primary theme-circle">
                 <div class="card-body">
-                    <h4 class="text-dark ">Category</h4>
+                    <h4 class="text-dark">Category</h4>
                     <div class="mt-3">
                         <div class="d-flex align-items-center">
                             <span class="text-dark mr-3">
-                                <h3 class="">30</h3>
+                                <h3 class=""><?php echo $category_count; ?></h3>
                             </span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 mb-3">
+        <div class="col-md-3 mb-3">
             <div class="card bg-white border-0 circle-secondary theme-circle">
                 <div class="card-body">
-                    <h4 class="text-dark ">Orders</h4>
+                    <h4 class="text-dark">Orders</h4>
                     <div class="mt-3">
                         <div class="d-flex align-items-center">
                             <span class="text-dark mr-3">
-                                <h3 class="">20</h3>
+                                <h3 class=""><?php echo $order_count; ?></h3>
                             </span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 mb-3">
+        <div class="col-md-3 mb-3">
             <div class="card bg-white border-0 circle-success theme-circle">
                 <div class="card-body">
-                    <h4 class="text-dark ">Product</h4>
+                    <h4 class="text-dark">Product</h4>
                     <div class="mt-3">
                         <div class="d-flex align-items-center">
                             <span class="text-dark mr-3">
-                                <h3 class="">120</h3>
+                                <h3 class=""><?php echo $product_count; ?></h3>
                             </span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 mb-3">
+        <div class="col-md-3 mb-3">
             <div class="card bg-white border-0 circle-info theme-circle">
                 <div class="card-body">
-                    <h4 class="text-dark ">User</h4>
+                    <h4 class="text-dark">User</h4>
                     <div class="mt-3">
                         <div class="d-flex align-items-center">
                             <span class="text-dark mr-3">
-                                <h3 class="">4</h3>
+                                <h3 class=""><?php echo $user_count; ?></h3>
                             </span>
                         </div>
                     </div>
@@ -131,13 +131,7 @@
         </div>
     </div>
 </div>
-        <div class="col-md-6 mb-3">
-            <div class="card border-0">
-                <div class="card-body">
-                     <div id="piechart" style="width: 100%;height:350px;"></div>
-                </div>
-            </div>
-        </div>
+
             <!-- Table Panel -->
             <div class="col-md-12 mb-5">
                 <div class="card">

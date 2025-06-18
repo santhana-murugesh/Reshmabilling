@@ -2,7 +2,7 @@
     include 'db_connect.php';
     $month = isset($_GET['month']) ? $_GET['month'] : date('Y-m');
 ?>
-<div class="container-fluid">
+<div class="container-fluid mt-4">
     <div class="col-lg-12">
         <div class="card">
             <div class="card_body">

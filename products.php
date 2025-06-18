@@ -2,7 +2,7 @@
 
 <div class="container-fluid">
 	
-	<div class="col-lg-12">
+	<div class="col-lg-12 mt-4" >
 		<div class="row">
 			<!-- FORM Panel -->
 			<!-- <div class="col-md-4">
