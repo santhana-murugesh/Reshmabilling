@@ -29,7 +29,7 @@
   
   <script src="assets/vendor/jquery/jquery.min.js"></script>
   <script src="assets/DataTables/datatables.min.js"></script>
-  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js" defer></script>
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js" ></script>
   <script src="assets/vendor/jquery.easing/jquery.easing.min.js"></script>
   <script src="assets/vendor/php-email-form/validate.js"></script>
   <script src="assets/vendor/venobox/venobox.min.js"></script>

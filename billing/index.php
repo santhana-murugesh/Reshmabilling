@@ -77,7 +77,7 @@
     width: 100%;
     height: 100vh;
     background-color: #fff;
-    background-image: url("../assets/uploads/loader.gif");
+    background-image: url("../assets/uploads/reshma_crackers_fireworks_fast.gif");
     background-repeat: no-repeat;
     background-position: center;
     background-size:500px;

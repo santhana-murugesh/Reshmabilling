@@ -8,7 +8,15 @@
     color: #000000b3;
 }
 </style>
-
+<?php
+include 'db_connect.php';
+$qry = $conn->query("SELECT * from system_settings limit 1");
+if($qry->num_rows > 0){
+	foreach($qry->fetch_array() as $k => $val){
+		$meta[$k] = $val;
+	}
+}
+ ?>
 <nav class="navbar navbar-light fixed-top bg-white">
   <div class="container-fluid mt-2 mb-2">
   	<div class="col-lg-12">
@@ -17,7 +25,7 @@
   		</div>
       <div class="col-md-2 float-left text-dark">
         <!-- <large><b><?php echo isset($_SESSION['system']['name']) ? $_SESSION['system']['name'] : '' ?></b></large> -->
-         <img src="assets/uploads/logo.png" width="180px">
+         <img src="<?php echo isset($meta['cover_img']) ? 'assets/uploads/'.$meta['cover_img'] :'' ?>" alt="" id="cimg" width="180px">
       </div>
        <div class="col-md-8 float-left text-dark mt-3">
       </div>

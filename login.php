@@ -51,7 +51,6 @@ header("location:index.php?page=home");
   <main id="main" >
   	
   		<div class="align-self-center w-100">
-		
   		<div id="login-center" class="row justify-content-start">
   			<div class="card col-md-3 ml-5">
   				<div class="card-body py-5 px-1">

@@ -63,6 +63,13 @@ if($qry->num_rows > 0){
 		<div class="card-body">
 			<form action="" id="manage-settings">
 				<div class="form-group">
+					<label for="" class="control-label">Logo</label>
+					<input type="file" class="form-control" name="img" onchange="displayImg(this,$(this))">
+					<div class="form-group">
+					<img src="<?php echo isset($meta['cover_img']) ? 'assets/uploads/'.$meta['cover_img'] :'' ?>" alt="" id="cimg">
+				</div>
+				</div>
+				<div class="form-group">
 					<label for="name" class="control-label">System Name</label>
 					<input type="text" class="form-control" id="name" name="name" value="<?php echo isset($meta['name']) ? $meta['name'] : '' ?>" required>
 				</div>
@@ -79,13 +86,8 @@ if($qry->num_rows > 0){
 					<textarea name="about" class="text-jqte" id="page_content"><?php echo isset($meta['about_content']) ? $meta['about_content'] : '' ?></textarea>
 
 				</div>
-				<div class="form-group">
-					<label for="" class="control-label">Image</label>
-					<input type="file" class="form-control" name="img" onchange="displayImg(this,$(this))">
-				</div>
-				<div class="form-group">
-					<img src="<?php echo isset($meta['cover_img']) ? 'assets/uploads/'.$meta['cover_img'] :'' ?>" alt="" id="cimg">
-				</div>
+				
+				
 				<center>
 					<button class="btn btn-info btn-primary btn-block col-md-2">Save</button>
 				</center>
@@ -93,11 +95,87 @@ if($qry->num_rows > 0){
 		</div>
 	</div>
 	<style>
-	img#cimg{
-		max-height: 10vh;
-		max-width: 6vw;
-	}
+/* Image preview */
+#cimg {
+    max-height: 100px;
+    max-width: 100px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    margin-top: 10px;
+    object-fit: cover;
+}
+
+/* Form container */
+.card-body {
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* Form elements */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+    color: #333;
+}
+
+.form-control {
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #3b82f6;
+    outline: none;
+    box-shadow: 0 0 0 0.1rem rgba(59, 130, 246, 0.25);
+}
+
+/* Button styling */
+button.btn {
+    background-color: #3b82f6;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+button.btn:hover {
+    background-color: #2563eb;
+}
+
+/* Center button properly */
+.center {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Froala editor spacing */
+.fr-wrapper {
+    min-height: 200px;
+}
+
+@media (max-width: 768px) {
+    .card-body {
+        padding: 20px;
+    }
+
+    #cimg {
+        max-width: 80px;
+        max-height: 80px;
+    }
+}
 </style>
+
 
 <script>
 	function displayImg(input,_this) {
