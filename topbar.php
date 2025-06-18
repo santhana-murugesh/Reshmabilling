@@ -25,7 +25,7 @@ if($qry->num_rows > 0){
   		</div>
       <div class="col-md-2 float-left text-dark">
         <!-- <large><b><?php echo isset($_SESSION['system']['name']) ? $_SESSION['system']['name'] : '' ?></b></large> -->
-         <img src="<?php echo isset($meta['cover_img']) ? 'assets/uploads/'.$meta['cover_img'] :'' ?>" alt="" id="cimg" width="180px">
+         <img src="<?php echo isset($meta['cover_img']) ? 'assets/uploads/'.$meta['cover_img'] :'' ?>" alt="" id="cimg" style="width: 10rem; height: 4rem;" width="10rem" height="4rem">
       </div>
        <div class="col-md-8 float-left text-dark mt-3">
       </div>

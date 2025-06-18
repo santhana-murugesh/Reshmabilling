@@ -11,6 +11,12 @@ ob_start();
 	}
 // }
 ob_end_flush();
+$qry = $conn->query("SELECT * from system_settings limit 1");
+if($qry->num_rows > 0){
+	foreach($qry->fetch_array() as $k => $val){
+		$meta[$k] = $val;
+	}
+}
 ?>
 <head>
   <meta charset="utf-8">
@@ -55,7 +61,7 @@ header("location:index.php?page=home");
   			<div class="card col-md-3 ml-5">
   				<div class="card-body py-5 px-1">
   					<h4 class="text-dark text-center mb-5"><!-- ?php echo $_SESSION['system']['name'] ?> -->
-  						<img src="assets/uploads/logo.png" width="300px">
+  						 <img src="<?php echo isset($meta['cover_img']) ? 'assets/uploads/'.$meta['cover_img'] :'' ?>" alt="" id="cimg" width="180px">
   					</h4>
   					<form id="login-form" >
   						<div class="form-group">
