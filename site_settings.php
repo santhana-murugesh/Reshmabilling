@@ -86,8 +86,10 @@ if($qry->num_rows > 0){
 					<textarea name="about" class="text-jqte" id="page_content"><?php echo isset($meta['about_content']) ? $meta['about_content'] : '' ?></textarea>
 
 				</div>
-				
-				
+				<!-- <div class="form-group">
+					<label for="discount" class="control-label">Overall Discount</label>
+					<input name="discount" class="form-control" id="discount"><?php echo isset($meta['discount']) ? $meta['discount'] : '' ?>
+				</div> -->
 				<center>
 					<button class="btn btn-info btn-primary btn-block col-md-2">Save</button>
 				</center>

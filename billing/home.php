@@ -4,7 +4,7 @@ function generateOrderNumber($conn) {
     $query = $conn->query("SELECT MAX(CAST(SUBSTRING(order_number, 4) AS UNSIGNED)) as max_num FROM orders");
     $result = $query->fetch_assoc();
     $next_num = $result['max_num'] + 1;
-    return 'ORD' . str_pad($next_num, 6, '0', pad_type: STR_PAD_LEFT);
+    return 'ORD' . str_pad($next_num, 6, '0', STR_PAD_LEFT);
 }
 
 if(isset($_GET['id'])) {
@@ -25,421 +25,640 @@ if(isset($_GET['id'])) {
 }
 ?>
 <style>
-   span.float-right.summary_icon {
-    font-size: 3rem;
-    position: absolute;
-    right: 1rem;
-    top: 0;
-}
-    .bg-gradient-primary{
-        background: rgb(119,172,233);
-        background: linear-gradient(149deg, rgba(119,172,233,1) 5%, rgba(83,163,255,1) 10%, rgba(46,51,227,1) 41%, rgba(40,51,218,1) 61%, rgba(75,158,255,1) 93%, rgba(124,172,227,1) 98%);
+    :root {
+        --primary-color: #4361ee;
+        --secondary-color: #3f37c9;
+        --accent-color: #4895ef;
+        --success-color: #4cc9f0;
+        --danger-color: #f72585;
+        --light-color: #f8f9fa;
+        --dark-color: #212529;
     }
-    .btn-primary-gradient{
-        background: linear-gradient(to right, #1e85ff 0%, #00a5fa 80%, #00e2fa 100%);
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f7fa;
     }
-    .btn-danger-gradient{
-        background: linear-gradient(to right, #f25858 7%, #ff7840 50%, #ff5140 105%);
+    
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: none;
+        overflow: hidden;
     }
-    main .card{
-        height:calc(100%);
+    
+    .card-header {
+        background-color: var(--primary-color);
+        color: white;
+        font-weight: 600;
+        padding: 15px 20px;
+        border-bottom: none;
     }
-    main .card-body{
-        height:calc(100%);
-        overflow: auto;
-        padding: 5px;
-        position: relative;
+    
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
     }
-    main .container-fluid, main .container-fluid>.row,main .container-fluid>.row>div{
-        /*height:calc(100%);*/
+    
+    .btn-primary:hover {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
     }
-    #o-list{
-        height: calc(87%);
-        overflow: auto;
+    
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
     }
-    #calc{
-        position: absolute;
-        bottom: 1rem;
-        height: calc(10%);
-        width: calc(98%);
+    
+    .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #212529;
     }
-    .prod-item{
-        min-height: 12vh;
+    
+    .btn-danger {
+        background-color: var(--danger-color);
+        border-color: var(--danger-color);
+    }
+    
+    .prod-item {
         cursor: pointer;
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 15px;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        height: 100%;
     }
-    .prod-item:hover{
-        opacity: .8;
+    
+    .prod-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
     }
+    
+    .prod-item img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+    }
+    
     .prod-item .card-body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
+        padding: 10px;
     }
-    input[name="qty[]"]{
+    
+    .prod-item .card-text {
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+    
+    .prod-item .price {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+    
+    #o-list {
+        background-color: white;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .order-item {
+        border-bottom: 1px solid #eee;
+        padding: 10px 0;
+    }
+    
+    .order-item:last-child {
+        border-bottom: none;
+    }
+    
+    .btn-qty {
         width: 30px;
-        text-align: center
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        font-weight: bold;
     }
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
+    
+    .qty-input {
+        width: 40px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin: 0 5px;
     }
-    #cat-list{
-        /*height: calc(100%)*/
+    
+    .btn-remove {
+        color: var(--danger-color);
+        background: none;
+        border: none;
+        font-size: 1.2rem;
     }
-    .cat-item{
-        cursor: pointer;
+    
+    .btn-remove:hover {
+        color: #d1144a;
     }
-    .cat-item:hover{
-        opacity: .8;
+    
+    .summary-card {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    
+    .summary-total {
+        font-weight: 600;
+        font-size: 1.2rem;
+        color: var(--primary-color);
+        border-top: 1px solid #eee;
+        padding-top: 10px;
+        margin-top: 10px;
+    }
+    
+    .category-btn {
+        margin-right: 10px;
+        margin-bottom: 10px;
+        border-radius: 20px;
+        padding: 5px 15px;
+    }
+    
+    .category-btn.active {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    #prod-list {
+        padding: 15px;
+    }
+    
+    .discount-badge {
+        background-color: #28a745;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        margin-left: 5px;
+    }
+    
+    .modal-header {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .prod-item {
+            margin-bottom: 10px;
+        }
     }
 </style>
-<?php 
-if(isset($_GET['id'])):
-$order = $conn->query("SELECT * FROM orders where id = {$_GET['id']}");
-foreach($order->fetch_array() as $k => $v){
-    $$k= $v;
-}
-$items = $conn->query("SELECT o.*,p.name FROM order_items o inner join products p on p.id = o.product_id where o.order_id = $id ");
-endif;
-?>
-<div class="container-fluid o-field">
-	<div class="row mt-3 ml-3 mr-3">
-      
-        <div class="col-lg-8  p-field">
-            <div class="card ">
-                <div class="card-header text-dark">
-                    <b>Products</b>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Products Column -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Products</span>
+                        <a class="btn btn-sm btn-light" href="../index.php">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </div>
                 </div>
-                <div class="card-body row" id='prod-list'>
-                    <div class="col-md-12">
-                      <!--    <b>Category</b> -->
-                        <div class=" row justify-content-start align-items-center" id="cat-list">
-                            <div class="mx-3 cat-item" data-id = 'all'>    
-                                <button class="btn btn-primary"><b class="text-white">All</b></button>
-                            </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex flex-wrap" id="cat-list">
+                            <button class="btn btn-outline-primary category-btn active" data-id='all'>All</button>
                             <?php 
                             $qry = $conn->query("SELECT * FROM categories order by name asc");
                             while($row=$qry->fetch_assoc()):
                             ?>
-                            <div class="mx-3 cat-item"  data-id = '<?php echo $row['id'] ?>'>
-                                <button class="btn btn-primary"><?php echo ucwords($row['name']) ?></button>
-                            </div>
+                            <button class="btn btn-outline-primary category-btn" data-id='<?php echo $row['id'] ?>'>
+                                <?php echo ucwords($row['name']) ?>
+                            </button>
                             <?php endwhile; ?>
                         </div>
-                   
-                        <hr>
-                        <div class="row">
-                            <?php
-                            $prod = $conn->query("SELECT * FROM products where status = 1 order by name asc");
-                            while($row=$prod->fetch_assoc()):
-                            ?>
-                            <div class="col-md-2 mb-2">
-                                <div class="prod-item text-center " data-json = '<?php echo json_encode($row) ?>' data-category-id="<?php echo $row['category_id'] ?>">
-                                    <img src="../uploads/products/<?php echo $row['image_path'] ?>" class="rounded" width="100%" height="100%" >
-                                        <span> 
-                                            <?php echo $row['name'] ?>
-                                        </span>
+                    </div>
+                    
+                    <div class="row" id="prod-list">
+                        <?php
+                        $prod = $conn->query("SELECT * FROM products where status = 1 order by name asc");
+                        while($row=$prod->fetch_assoc()):
+                        ?>
+                        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+                            <div class="card prod-item h-100" data-json='<?php echo json_encode($row) ?>' data-category-id="<?php echo $row['category_id'] ?>">
+                                <img src="../uploads/products/<?php echo $row['image_path'] ?>" class="card-img-top" alt="<?php echo $row['name'] ?>">
+                                <div class="card-body p-2 text-center">
+                                    <h6 class="card-text mb-1"><?php echo $row['name'] ?></h6>
+                                    <div class="price">₱<?php echo number_format($row['price'], 2) ?></div>
                                 </div>
                             </div>
-                        <?php endwhile; ?>
                         </div>
-                    </div>   
-                </div>
-            <div class="card-footer">
-                <div class="row justify-content-center">
-                    <div class="btn btn btn-sm col-sm-3 btn-primary mr-2" type="button" id="pay">Print</div>
+                        <?php endwhile; ?>
+                    </div>
                 </div>
             </div>
-            </div>      			
         </div>
-          <div class="col-lg-4">
-           <div class="card">
-                <div class="card-header text-dark">
-                    <b>Order List</b>
-                <span class="float:right"><a class="btn btn-primary btn-sm col-sm-3 float-right" href="../index.php" id="">
-                    <i class="fa fa-home"></i> Home 
-                </a></span>
+        
+        <!-- Order Summary Column -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Order Summary</span>
+                        <button type="button" class="btn btn-sm btn-warning" id="apply-discount">
+                            Apply Discount
+                        </button>
+                    </div>
                 </div>
-               <div class="card-body">
-            <form action="" id="manage-order">
-                <input type="hidden" name="id" value="<?php echo isset($_GET['id']) ? $_GET['id'] : '' ?>">
-                <div class="bg-white" id='o-list'>
-                            <div class="d-flex w-100 bg-white mb-1">
-                                <label for="" class="text-dark"><b>Order No.</b></label>
-                                <input type="text" class="form-control-sm" name="order_number" value="<?php echo isset($order_number) ? $order_number : generateOrderNumber() ?>" readonly required>
+                
+                <div class="card-body">
+                    <form action="" id="manage-order">
+                        <input type="hidden" name="id" value="<?php echo isset($_GET['id']) ? $_GET['id'] : '' ?>">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Order Number</label>
+                            <input type="text" class="form-control" name="order_number" value="<?php echo isset($order_number) ? $order_number : generateOrderNumber($conn) ?>" readonly required>
+                        </div>
+                        
+                        <div id="o-list">
+                            <div class="d-flex justify-content-between mb-2">
+                                <h6 class="fw-bold">Items</h6>
+                                <h6 class="fw-bold">Amount</h6>
                             </div>
-                   <table class="table bg-light mb-5" >
-                        <colgroup>
-                            <col width="20%">
-                            <col width="40%">
-                            <col width="40%">
-                            <col width="5%">
-                        </colgroup>
-                       <thead>
-                           <tr>
-                               <th>QTY</th>
-                               <th>Order</th>
-                               <th>Amount</th>
-                               <th></th>
-                           </tr>
-                       </thead>
-                       <tbody>
-                           <?php 
-                                if(isset($items)):
-                           while($row=$items->fetch_assoc()):
-                           ?>
-                           <tr>
-                               <td>
-                                   <div class="d-flex align-items-center justify-content-center">
-                                        <span class="btn-minus"><b> </b></span>
-                                        <input type="number" name="qty[]" id="" value="<?php echo $row['qty'] ?>">
-                                        <span class="btn-plus"><b></b></span>
-                                   </div>
-                                </td>
-                                <td>
-                                    <input type="hidden" name="item_id[]" id="" value="<?php echo $row['id'] ?>">
-                                    <input type="hidden" name="product_id[]" id="" value="<?php echo $row['product_id'] ?>"><?php echo ucwords($row['name']) ?>
-                                    <small class="psmall"> (<?php echo number_format($row['price'],2) ?>)</small>
-                                </td>
-                                <td class="text-right">
-                                    <input type="hidden" name="price[]" id="" value="<?php echo $row['price'] ?>">
-                                    <input type="hidden" name="amount[]" id="" value="<?php echo $row['amount'] ?>">
-                                    <span class="amount"><?php echo number_format($row['amount'],2) ?></span>
-                                </td>
-                                <td>
-                                    <span class="btn-rem"><b><i class="fa fa-trash-alt"></i></b></span>
-                                </td>
-                           </tr>
-                           <script>
-                               $(document).ready(function(){
-                                 qty_func()
-                                    calc()
-                                    cat_func();
-                               })
-                           </script>
-                       <?php endwhile; ?>
-                       <?php endif; ?>
-                       </tbody>
-                   </table>
+                            
+                            <div id="order-items-container">
+                                <?php if(isset($items)): ?>
+                                <?php while($row=$items->fetch_assoc()): ?>
+                                <div class="order-item">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <div>
+                                            <input type="hidden" name="item_id[]" value="<?php echo $row['id'] ?>">
+                                            <input type="hidden" name="product_id[]" value="<?php echo $row['product_id'] ?>">
+                                            <strong><?php echo ucwords($row['name']) ?></strong>
+                                            <small class="text-muted">(₱<?php echo number_format($row['price'], 2) ?>)</small>
+                                        </div>
+                                        <span class="text-end">
+                                            <input type="hidden" name="price[]" value="<?php echo $row['price'] ?>">
+                                            <input type="hidden" name="amount[]" value="<?php echo $row['amount'] ?>">
+                                            ₱<span class="amount"><?php echo number_format($row['amount'], 2) ?></span>
+                                        </span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary btn-qty btn-minus">-</button>
+                                            <input type="number" name="qty[]" class="form-control form-control-sm qty-input" value="<?php echo $row['qty'] ?>">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary btn-qty btn-plus">+</button>
+                                        </div>
+                                        <button type="button" class="btn-remove btn-rem">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <?php endwhile; ?>
+                                <?php endif; ?>
+                            </div>
+                            
+                            <?php if(!isset($items)): ?>
+                            <div class="text-center py-4 text-muted">
+                                <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                                <p>No items added yet</p>
+                                <p>Click on products to add them to order</p>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <div class="summary-card mt-3">
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span>₱<span id="subtotal_amount">0.00</span></span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Discount <span id="discount-percent-display">(0%)</span>:</span>
+                                <span>
+                                    -₱<span id="discount_display">0.00</span>
+                                    <input type="hidden" name="discount_percent" value="0">
+                                    <input type="hidden" name="discount_amount" value="0">
+                                </span>
+                            </div>
+                            <div class="summary-row summary-total">
+                                <span>Total:</span>
+                                <span>
+                                    ₱<span id="total_amount">0.00</span>
+                                    <input type="hidden" name="total_amount" value="0">
+                                    <input type="hidden" name="total_tendered" value="0">
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-3">
+                            <button type="button" class="btn btn-primary btn-lg" id="pay">
+                                <i class="fas fa-print"></i> Print Receipt
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                   <div class="d-block bg-white" id="calc">
-                       <table class="" width="100%">
-                           <tbody>
-                                <tr>
-                                   <td><b><h6>Total</h6></b></td>
-                                   <td class="text-right">
-                                       <input type="hidden" name="total_amount" value="0">
-                                       <input type="hidden" name="total_tendered" value="0">
-                                       <span class=""><h6><b id="total_amount">0.00</b></h6></span>
-                                   </td>
-                               </tr>
-                           </tbody>
-                       </table>
-                   </div>
-            </form>
-               </div>
-           </div>
+            </div>
         </div>
     </div>
 </div>
-<div class="modal fade" id="pay_modal" role='dialog'>
-    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-        <h5 class="modal-title"><b>Print</b></h5>
-         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="container-fluid">
-            <div class="form-group">
-                        <label for="">Amount Payable</label>
-                        <input type="text" class="form-control text-right" id="apayable" readonly value="">
-                    </div>
-            <div class="form-group">
-                <label for="">Amount received</label>
-                <input type="text" class="form-control text-right" id="tendered" value="" autocomplete="off">
+
+<!-- Payment Modal -->
+<div class="modal fade" id="pay_modal" tabindex="-1" role="dialog" aria-labelledby="payModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="payModalLabel">Payment</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <div class="form-group">
-                <label for="">Balance</label>
-                <input type="text" class="form-control text-right" id="change" value="0.00" readonly="">
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Amount Payable</label>
+                    <input type="text" class="form-control text-end" id="apayable" readonly value="0.00">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Amount Received</label>
+                    <input type="text" class="form-control text-end" id="tendered" value="" autocomplete="off">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Change</label>
+                    <input type="text" class="form-control text-end" id="change" value="0.00" readonly>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary" form="manage-order">Confirm & Print</button>
             </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="submit" class="btn btn-primary btn-sm"  form="manage-order">print</button>
-        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
-      </div>
-      </div>
     </div>
-  </div>
+</div>
+
 <script>
-    var total;
-    cat_func();
-   $('#prod-list .prod-item').click(function(){
-        var data = $(this).attr('data-json')
-            data = JSON.parse(data)
-        if($('#o-list tr[data-id="'+data.id+'"]').length > 0){
-            var tr = $('#o-list tr[data-id="'+data.id+'"]')
-            var qty = tr.find('[name="qty[]"]').val();
-                qty = parseInt(qty) + 1;
-                tr.find('[name="qty[]"]').val(qty).trigger('change')
-                calc()
-            return false;
-        }
-        var tr = $('<tr class="o-item" data-id="'+data.id+'"></tr>')
-        tr.attr('data-id',data.id)
-        tr.append('<td><div class="d-flex align-items-center"><span class="btn-minus"><b></i></b></span><input type="number" name="qty[]" id="" value="1"><span class="btn-plus"><b></b></span></div></td>') 
-
-
-        tr.append('<td><input type="hidden" name="item_id[]" id="" value=""><input type="hidden" name="product_id[]" id="" value="'+data.id+'">'+data.name+' <small class="psmall">('+(parseFloat(data.price).toLocaleString("en-US",{style:'decimal',minimumFractionDigits:2,maximumFractionDigits:2}))+')</small></td>') 
-
-
-        tr.append('<td class="text-right"><input type="hidden" name="price[]" id="" value="'+data.price+'"><input type="hidden" name="amount[]" id="" value="'+data.price+'"><span class="amount">'+(parseFloat(data.price).toLocaleString("en-US",{style:'decimal',minimumFractionDigits:2,maximumFractionDigits:2}))+'</span></td>') 
-
+    $(document).ready(function(){
+        // Initialize calculations
+        calc();
         
-        tr.append('<td><span class="btn-rem"><b><i class="fa fa-trash-alt text"></i></b></span></td>')
-        $('#o-list tbody').append(tr)
-        qty_func()
-        calc()
-        cat_func();
-   })
-    function qty_func(){
-         $('#o-list .btn-minus').click(function(){
-            var qty = $(this).siblings('input').val()
-                qty = qty > 1 ? parseInt(qty) - 1 : 1;
-                $(this).siblings('input').val(qty).trigger('change')
-                calc()
-         })
-         $('#o-list .btn-plus').click(function(){
-            var qty = $(this).siblings('input').val()
-                qty = parseInt(qty) + 1;
-                $(this).siblings('input').val(qty).trigger('change')
-                calc()
-         })
-         $('#o-list .btn-rem').click(function(){
-            $(this).closest('tr').remove()
-            calc()
-         })
-         
-         // Add event handlers for direct input changes
-         $('#o-list input[name="qty[]"]').on('input change', function(){
-            var tr = $(this).closest('tr');
-            var qty = $(this).val();
-            if(qty < 1) {
-                qty = 1;
-                $(this).val(1);
+        // Product click handler
+        $('#prod-list .prod-item').click(function(){
+            var data = $(this).attr('data-json');
+            data = JSON.parse(data);
+            
+            // Check if product already exists in order
+            var existingItem = $(`#order-items-container .order-item input[name="product_id[]"][value="${data.id}"]`).closest('.order-item');
+            
+            if(existingItem.length > 0){
+                // Increment quantity if product exists
+                var qtyInput = existingItem.find('[name="qty[]"]');
+                qtyInput.val(parseInt(qtyInput.val()) + 1).trigger('change');
+                calc();
+                return false;
             }
-            var price = tr.find('[name="price[]"]').val()
-            var amount = parseFloat(qty) * parseFloat(price);
-            tr.find('[name="amount[]"]').val(amount)
-            tr.find('.amount').text(parseFloat(amount).toLocaleString("en-US",{style:'decimal',minimumFractionDigits:2,maximumFractionDigits:2}))
-            calc()
-         });
-    }
-    function calc(){
-         var total = 0;
-         $('[name="amount[]"]').each(function(){
-            total = parseFloat(total) + parseFloat($(this).val()) 
-         })
-        $('[name="total_amount"]').val(total)
-        $('#total_amount').text(parseFloat(total).toLocaleString("en-US",{style:'decimal',minimumFractionDigits:2,maximumFractionDigits:2}))
-        $('#apayable').val(parseFloat(total).toLocaleString("en-US",{style:'decimal',minimumFractionDigits:2,maximumFractionDigits:2}))
-    }
-   function cat_func(){
-    $('.cat-item').click(function(){
-            var id = $(this).attr('data-id')
-            console.log(id)
-            if(id == 'all'){
-                $('.prod-item').parent().toggle(true)
-            }else{
-                $('.prod-item').each(function(){
-                    if($(this).attr('data-category-id') == id){
-                        $(this).parent().toggle(true)
-                    }else{
-                        $(this).parent().toggle(false)
-                    }
-                })
+            
+            // Create new order item
+            var itemHtml = `
+                <div class="order-item">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div>
+                            <input type="hidden" name="item_id[]" value="">
+                            <input type="hidden" name="product_id[]" value="${data.id}">
+                            <strong>${data.name}</strong>
+                            <small class="text-muted">(₱${parseFloat(data.price).toLocaleString("en-US",{style:'decimal',minimumFractionDigits:2,maximumFractionDigits:2})})</small>
+                        </div>
+                        <span class="text-end">
+                            <input type="hidden" name="price[]" value="${data.price}">
+                            <input type="hidden" name="amount[]" value="${data.price}">
+                            ₱<span class="amount">${parseFloat(data.price).toLocaleString("en-US",{style:'decimal',minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <button type="button" class="btn btn-sm btn-outline-secondary btn-qty btn-minus">-</button>
+                            <input type="number" name="qty[]" class="form-control form-control-sm qty-input" value="1">
+                            <button type="button" class="btn btn-sm btn-outline-secondary btn-qty btn-plus">+</button>
+                        </div>
+                        <button type="button" class="btn-remove btn-rem">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Add to order items container
+            $('#order-items-container').append(itemHtml);
+            
+            // If this is the first item, remove the empty state message
+            if($('#order-items-container .order-item').length === 1) {
+                $('#o-list .text-center').remove();
             }
-    })
-   }
-   $('#save_order').click(function(){
-    $('#tendered').val('').trigger('change')
-    $('[name="total_tendered"]').val('')
-    $('#manage-order').submit()
-   })
-   $("#pay").click(function(){
-    start_load()
-    var amount = $('[name="total_amount"]').val()
-    if($('#o-list tbody tr').length <= 0){
-        alert_toast("Please add atleast 1 product first.",'danger')
-        end_load()
-        return false;
-    }
-    $('#apayable').val(parseFloat(amount).toLocaleString("en-US",{style:'decimal',minimumFractionDigits:2,maximumFractionDigits:2}))
-    $('#pay_modal').modal('show')
-    setTimeout(function(){
-        $('#tendered').val('').trigger('change')
-        $('#tendered').focus()
-        end_load()
-    },500)
-    
-   })
-   $('#tendered').keyup('input',function(e){
-        if(e.which == 13){
-            $('#manage-order').submit();
-            return false;
+            
+            // Initialize quantity handlers
+            qty_func();
+            calc();
+        });
+        
+        // Quantity handlers
+        function qty_func(){
+            $('#order-items-container').on('click', '.btn-minus', function(){
+                var qtyInput = $(this).siblings('[name="qty[]"]');
+                var qty = parseInt(qtyInput.val());
+                qty = qty > 1 ? qty - 1 : 1;
+                qtyInput.val(qty).trigger('change');
+                calc();
+            });
+            
+            $('#order-items-container').on('click', '.btn-plus', function(){
+                var qtyInput = $(this).siblings('[name="qty[]"]');
+                var qty = parseInt(qtyInput.val()) + 1;
+                qtyInput.val(qty).trigger('change');
+                calc();
+            });
+            
+            $('#order-items-container').on('click', '.btn-rem', function(){
+                $(this).closest('.order-item').remove();
+                calc();
+                
+                // Show empty state if no items left
+                if($('#order-items-container .order-item').length === 0) {
+                    $('#order-items-container').html(`
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                            <p>No items added yet</p>
+                            <p>Click on products to add them to order</p>
+                        </div>
+                    `);
+                }
+            });
+            
+            $('#order-items-container').on('change input', '[name="qty[]"]', function(){
+                var qty = $(this).val();
+                if(qty < 1) {
+                    qty = 1;
+                    $(this).val(1);
+                }
+                
+                var item = $(this).closest('.order-item');
+                var price = item.find('[name="price[]"]').val();
+                var amount = parseFloat(qty) * parseFloat(price);
+                
+                item.find('[name="amount[]"]').val(amount);
+                item.find('.amount').text(parseFloat(amount).toLocaleString("en-US",{style:'decimal',minimumFractionDigits:2,maximumFractionDigits:2}));
+                calc();
+            });
         }
-        var tend = $(this).val()
-            tend =tend.replace(/,/g,'') 
-        $('[name="total_tendered"]').val(tend)
-        if(tend == '')
-            $(this).val('')
-        else
-            $(this).val((parseFloat(tend).toLocaleString("en-US")))
-        tend = tend > 0 ? tend : 0;
-        var amount=$('[name="total_amount"]').val()
-        var change = parseFloat(tend) - parseFloat(amount)
-        $('#change').val(parseFloat(change).toLocaleString("en-US",{style:'decimal',minimumFractionDigits:2,maximumFractionDigits:2}))
-   })
-   
-    $('#tendered').on('input',function(){
-        var val = $(this).val()
-        val = val.replace(/[^0-9 \,]/, '');
-        $(this).val(val)
-    })
-    $('#manage-order').submit(function(e){
-        e.preventDefault();
-        start_load()
-        $.ajax({
-            url:'../ajax.php?action=save_order',
-            method:'POST',
-            data:$(this).serialize(),
-            success:function(resp){
-                if(resp > 0){
-                    if($('[name="total_tendered"]').val() > 0){
-                        alert_toast("Data successfully saved.",'success')
-                        setTimeout(function(){
-                            var nw = window.open('../receipt.php?id='+resp,"_blank","width=900,height=600")
+        
+        // Calculate totals
+        function calc(){
+            var subtotal = 0;
+            
+            $('[name="amount[]"]').each(function(){
+                subtotal += parseFloat($(this).val());
+            });
+            
+            // Display Subtotal
+            $('#subtotal_amount').text(subtotal.toLocaleString("en-US", { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+            
+            // Calculate Discount
+            var discountPercent = parseFloat($('[name="discount_percent"]').val());
+            var discountAmount = subtotal * (discountPercent / 100);
+            
+            $('[name="discount_amount"]').val(discountAmount);
+            $('#discount_display').text(discountAmount.toLocaleString("en-US", { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+            $('#discount-percent-display').text(`(${discountPercent}%)`);
+            
+            // Calculate Final Total
+            var total = subtotal - discountAmount;
+            $('[name="total_amount"]').val(total);
+            $('#total_amount').text(total.toLocaleString("en-US", { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+            $('#apayable').val(total.toLocaleString("en-US", { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+        }
+        
+        // Discount button
+        $('#apply-discount').click(function() {
+            var discountPercent = parseFloat($('[name="discount_percent"]').val());
+            
+            // Toggle between 10% and 0% discount
+            if (discountPercent === 10) {
+                $('[name="discount_percent"]').val(0);
+                $(this).removeClass('btn-success').addClass('btn-warning').text('Apply Discount');
+            } else {
+                $('[name="discount_percent"]').val(10);
+                $(this).removeClass('btn-warning').addClass('btn-success').text('Remove Discount');
+            }
+            
+            // Recalculate total
+            calc();
+        });
+        
+        // Category filter
+        $('.category-btn').click(function(){
+            $('.category-btn').removeClass('active');
+            $(this).addClass('active');
+            
+            var id = $(this).attr('data-id');
+            
+            if(id == 'all'){
+                $('.prod-item').parent().show();
+            } else {
+                $('.prod-item').each(function(){
+                    if($(this).attr('data-category-id') == id) {
+                        $(this).parent().show();
+                    } else {
+                        $(this).parent().hide();
+                    }
+                });
+            }
+        });
+        
+        // Print button
+        $('#pay').click(function(){
+            if($('#order-items-container .order-item').length <= 0){
+                alert_toast("Please add at least 1 product first.",'danger');
+                return false;
+            }
+            
+            $('#pay_modal').modal('show');
+            setTimeout(function(){
+                $('#tendered').val('').trigger('change');
+                $('#tendered').focus();
+            }, 500);
+        });
+        
+        // Tendered amount handling
+        $('#tendered').on('input', function(e){
+            var tend = $(this).val().replace(/,/g, '');
+            $('[name="total_tendered"]').val(tend);
+            
+            if(tend == '') {
+                $(this).val('');
+            } else {
+                $(this).val(parseFloat(tend).toLocaleString("en-US"));
+            }
+            
+            tend = tend > 0 ? tend : 0;
+            var amount = $('[name="total_amount"]').val();
+            var change = parseFloat(tend) - parseFloat(amount);
+            
+            $('#change').val(parseFloat(change).toLocaleString("en-US", { 
+                style: 'decimal', 
+                minimumFractionDigits: 2, 
+                maximumFractionDigits: 2 
+            }));
+        });
+        
+        // Form submission
+        $('#manage-order').submit(function(e){
+            e.preventDefault();
+            
+            if($('#order-items-container .order-item').length <= 0){
+                alert_toast("Please add at least 1 product first.",'danger');
+                return false;
+            }
+            
+            start_load();
+            
+            $.ajax({
+                url: '../ajax.php?action=save_order',
+                method: 'POST',
+                data: $(this).serialize(),
+                success: function(resp){
+                    if(resp > 0){
+                        if($('[name="total_tendered"]').val() > 0){
+                            alert_toast("Order saved successfully.",'success');
+                            
                             setTimeout(function(){
-                                nw.print()
+                                var nw = window.open('../receipt.php?id='+resp, "_blank", "width=900,height=600");
+                                
                                 setTimeout(function(){
-                                    nw.close()
-                                    location.reload()
-                                },500)
-                            },500)
-                        },500)
-                    }else{
-                        alert_toast("Data successfully saved.",'success')
-                        setTimeout(function(){
-                            location.reload()
-                        },500)
+                                    nw.print();
+                                    setTimeout(function(){
+                                        nw.close();
+                                        location.reload();
+                                    }, 500);
+                                }, 500);
+                            }, 500);
+                        } else {
+                            alert_toast("Order saved successfully.",'success');
+                            setTimeout(function(){
+                                location.reload();
+                            }, 500);
+                        }
                     }
                 }
-            }
-        })
-    })
+            });
+        });
+    });
 </script>

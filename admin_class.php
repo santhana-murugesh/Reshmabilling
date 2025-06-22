@@ -166,6 +166,7 @@ Class Action {
 		$data = " name = '".str_replace("'","&#x2019;",$name)."' ";
 		$data .= ", email = '$email' ";
 		$data .= ", contact = '$contact' ";
+		$data .= ", discount = '$discount' ";
 		$data .= ", about_content = '".htmlentities(str_replace("'","&#x2019;",$about))."' ";
 		if($_FILES['img']['tmp_name'] != ''){
 						$fname = strtotime(date('y-m-d H:i')).'_'.$_FILES['img']['name'];
